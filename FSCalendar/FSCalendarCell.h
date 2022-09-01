@@ -34,6 +34,11 @@ typedef NS_ENUM(NSUInteger, FSCalendarMonthPosition);
 @property (weak, nonatomic) CAShapeLayer *shapeLayer;
 
 /**
+ The shape child layer of the cell
+ */
+@property (weak, nonatomic) CAShapeLayer *shapeChildLayer;
+
+/**
  The imageView below shape layer of the cell
  */
 @property (weak, nonatomic) UIImageView *imageView;

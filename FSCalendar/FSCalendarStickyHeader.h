@@ -18,6 +18,7 @@
 
 @property (strong, nonatomic) NSDate *month;
 
+
 - (void)configureAppearance;
 
 @end

@@ -48,6 +48,7 @@
 - (void)commonInit
 {   
     UILabel *label;
+    CAShapeLayer *shapeChildLayer;
     CAShapeLayer *shapeLayer;
     UIImageView *imageView;
     FSCalendarEventIndicator *eventIndicator;
@@ -64,12 +65,20 @@
     [self.contentView addSubview:label];
     self.subtitleLabel = label;
     
+    shapeChildLayer = [CAShapeLayer layer];
+    shapeChildLayer.backgroundColor = [UIColor clearColor].CGColor;
+    shapeChildLayer.borderColor = [UIColor clearColor].CGColor;
+    shapeChildLayer.opacity = 0;
+    [self.contentView.layer insertSublayer:shapeChildLayer below:_titleLabel.layer];
+    self.shapeChildLayer = shapeChildLayer;
+    
     shapeLayer = [CAShapeLayer layer];
     shapeLayer.backgroundColor = [UIColor clearColor].CGColor;
-    shapeLayer.borderWidth = 1.0;
+    shapeLayer.borderWidth = 0.0;
+    shapeLayer.lineWidth = 2.0;
     shapeLayer.borderColor = [UIColor clearColor].CGColor;
     shapeLayer.opacity = 0;
-    [self.contentView.layer insertSublayer:shapeLayer below:_titleLabel.layer];
+    [self.contentView.layer insertSublayer:shapeLayer below: _shapeChildLayer];
     self.shapeLayer = shapeLayer;
     
     eventIndicator = [[FSCalendarEventIndicator alloc] initWithFrame:CGRectZero];
@@ -138,10 +147,20 @@
                                    diameter,
                                    diameter);
     
+    _shapeChildLayer.frame = CGRectMake(_shapeLayer.frame.origin.x + 3, _shapeLayer.frame.origin.y + 3, _shapeLayer.frame.size.width - 6, _shapeLayer.frame.size.height - 6);
+    
     CGPathRef path = [UIBezierPath bezierPathWithRoundedRect:_shapeLayer.bounds
                                                 cornerRadius:CGRectGetWidth(_shapeLayer.bounds)*0.5*self.borderRadius].CGPath;
+    
     if (!CGPathEqualToPath(_shapeLayer.path,path)) {
         _shapeLayer.path = path;
+    }
+    
+    CGPathRef childpath = [UIBezierPath bezierPathWithRoundedRect:_shapeChildLayer.bounds
+                                                cornerRadius:CGRectGetWidth(_shapeChildLayer.bounds)*0.5*self.borderRadius].CGPath;
+    
+    if (!CGPathEqualToPath(_shapeChildLayer.path, childpath)) {
+        _shapeChildLayer.path = childpath;
     }
     
     CGFloat eventSize = _shapeLayer.frame.size.height/6.0;
@@ -161,6 +180,7 @@
         [CATransaction setDisableActions:YES]; // Avoid blink of shape layer.
     }
     self.shapeLayer.opacity = 0;
+    self.shapeChildLayer.opacity = 0;
     [self.contentView.layer removeAnimationForKey:@"opacity"];
 }
 
@@ -183,6 +203,7 @@
     group.duration = FSCalendarDefaultBounceAnimationDuration;
     group.animations = @[zoomOut, zoomIn];
     [_shapeLayer addAnimation:group forKey:@"bounce"];
+    [_shapeChildLayer addAnimation:group forKey:@"bounce"];
     [self configureAppearance];
     
 }
@@ -234,6 +255,13 @@
                                                     cornerRadius:CGRectGetWidth(_shapeLayer.bounds)*0.5*self.borderRadius].CGPath;
         if (!CGPathEqualToPath(_shapeLayer.path, path)) {
             _shapeLayer.path = path;
+        }
+        
+        CGPathRef childpath = [UIBezierPath bezierPathWithRoundedRect:_shapeChildLayer.bounds
+                                                    cornerRadius:CGRectGetWidth(_shapeChildLayer.bounds)*0.5*self.borderRadius].CGPath;
+        
+        if (!CGPathEqualToPath(_shapeChildLayer.path, childpath)) {
+            _shapeChildLayer.path = childpath;
         }
         
     }
@@ -387,7 +415,7 @@ OFFSET_PROPERTY(preferredEventOffset, PreferredEventOffset, _appearance.eventOff
         self.contentView = view;
         
         self.eventLayers = [NSPointerArray weakObjectsPointerArray];
-        for (int i = 0; i < FSCalendarMaximumNumberOfEvents; i++) {
+        for (int i = 0; i < 3; i++) {
             CALayer *layer = [CALayer layer];
             layer.backgroundColor = [UIColor clearColor].CGColor;
             [self.contentView.layer addSublayer:layer];
@@ -450,7 +478,7 @@ OFFSET_PROPERTY(preferredEventOffset, PreferredEventOffset, _appearance.eventOff
 - (void)setNumberOfEvents:(NSInteger)numberOfEvents
 {
     if (_numberOfEvents != numberOfEvents) {
-        _numberOfEvents = MIN(MAX(numberOfEvents,0),FSCalendarMaximumNumberOfEvents);
+        _numberOfEvents = MIN(MAX(numberOfEvents,0),3);
         [self setNeedsLayout];
     }
 }

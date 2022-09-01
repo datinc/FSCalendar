@@ -18,6 +18,7 @@
 @property (weak  , nonatomic) UIView  *contentView;
 @property (weak  , nonatomic) UIView  *bottomBorder;
 @property (weak  , nonatomic) FSCalendarWeekdayView *weekdayView;
+@property int firstWeekday;
 
 @end
 
@@ -37,7 +38,10 @@
         self.contentView = view;
         
         label = [[UILabel alloc] initWithFrame:CGRectZero];
-        label.textAlignment = NSTextAlignmentCenter;
+        // label.textAlignment = NSTextAlignmentCenter;
+        // MARIO:
+        label.textAlignment = NSTextAlignmentLeft;
+        
         label.numberOfLines = 0;
         [_contentView addSubview:label];
         self.titleLabel = label;
@@ -66,15 +70,12 @@
     
     self.weekdayView.frame = CGRectMake(0, _contentView.fs_height-weekdayHeight-weekdayMargin, self.contentView.fs_width, weekdayHeight);
     
-    CGFloat titleHeight = [@"1" sizeWithAttributes:@{NSFontAttributeName:self.calendar.appearance.headerTitleFont}].height*1.5 + weekdayMargin*3;
+    CGFloat titleHeight = [@"1" sizeWithAttributes:@{NSFontAttributeName:self.calendar.appearance.headerTitleFont}].height*1.5 + weekdayMargin*3
+        + [@"1" sizeWithAttributes:@{NSFontAttributeName:self.calendar.appearance.subtitleFont}].height;
     
-    _bottomBorder.frame = CGRectMake(0, _contentView.fs_height-weekdayHeight-weekdayMargin*2, _contentView.fs_width, 1.0);
-
-    CGPoint titleHeaderOffset = self.calendar.appearance.headerTitleOffset;
-    _titleLabel.frame = CGRectMake(titleHeaderOffset.x,
-                                   titleHeaderOffset.y+_bottomBorder.fs_bottom-titleHeight-weekdayMargin,
-                                   titleWidth,
-                                   titleHeight);
+    _bottomBorder.frame = CGRectMake(_firstWeekday * (_contentView.fs_width / 7), _contentView.fs_height, _contentView.fs_width, 0.0);
+    _titleLabel.frame = CGRectMake(16, (_contentView.fs_height-weekdayHeight-weekdayMargin*2) -titleHeight-weekdayMargin, titleWidth,titleHeight);
+    
 }
 
 #pragma mark - Properties
@@ -94,8 +95,6 @@
 {
     _titleLabel.font = self.calendar.appearance.headerTitleFont;
     _titleLabel.textColor = self.calendar.appearance.headerTitleColor;
-    _titleLabel.textAlignment = self.calendar.appearance.headerTitleAlignment;
-    _bottomBorder.backgroundColor = self.calendar.appearance.headerSeparatorColor;
     [self.weekdayView configureAppearance];
 }
 
@@ -103,17 +102,29 @@
 {
     _month = month;
     _calendar.formatter.dateFormat = self.calendar.appearance.headerDateFormat;
-    BOOL usesUpperCase   = (self.calendar.appearance.caseOptions & 15) == FSCalendarCaseOptionsHeaderUsesUpperCase;
-    BOOL usesCapitalized = (self.calendar.appearance.caseOptions & 15) == FSCalendarCaseOptionsHeaderUsesCapitalized;
-
+    BOOL usesUpperCase = (self.calendar.appearance.caseOptions & 15) == FSCalendarCaseOptionsHeaderUsesUpperCase;
     NSString *text = [_calendar.formatter stringFromDate:_month];
-    if (usesUpperCase) {
-        text = text.uppercaseString;
-    } else if (usesCapitalized) {
-        text = text.capitalizedString;
-    }
-
+    text = usesUpperCase ? text.uppercaseString : text;
     self.titleLabel.text = text;
+    
+        
+    NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:text];
+//    [attr addAttributes:@{NSFontAttributeName:self.calendar.appearance.subtitleFont, NSForegroundColorAttributeName: self.calendar.appearance.subtitleDefaultColor} range:NSMakeRange(text.length-4, 4)];
+    
+        self.titleLabel.attributedText = attr;
+        
+      
+    
+    // Calculate offset for first weekday
+    
+    int weekday = (int)[_calendar.gregorian component:NSCalendarUnitWeekday fromDate:month];
+    _firstWeekday = ((weekday-1+7) - (_calendar.firstWeekday-1)) % 7;
+    
+    // Set difference to header
+    CGRect temp = _bottomBorder.frame;
+    temp.origin.x = _firstWeekday * (temp.size.width / 7);
+    _bottomBorder.frame = temp;
+    
 }
 
 @end

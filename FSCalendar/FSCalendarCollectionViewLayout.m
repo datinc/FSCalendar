@@ -491,7 +491,28 @@
                 x = 0;
                 y = self.sectionTops[indexPath.section] + self.headerReferenceSize.height + self.tops[coordinate.row] + self.heights[coordinate.row];
             }
-            CGFloat width = self.collectionView.fs_width;
+            
+            
+            CGFloat width = ({
+                CGFloat width = self.collectionView.fs_width;
+                if ([self.calendar.calculator numberOfRowsInSection:indexPath.section]-2 == coordinate.row) {
+                    
+                    NSInteger column = ({
+                        NSDate *month = [self.calendar.calculator dateForIndexPath:indexPath];
+                        NSDate *firstDayOfMonth = [self.calendar.gregorian fs_firstDayOfMonth:month];
+                        NSInteger weekdayOfFirstDay = [self.calendar.gregorian component:NSCalendarUnitWeekday fromDate:firstDayOfMonth];
+                        NSInteger numberOfDaysInMonth = [self.calendar.gregorian fs_numberOfDaysInMonth:month];
+                        NSInteger numberOfPlaceholdersForPrev = ((weekdayOfFirstDay - self.calendar.gregorian.firstWeekday) + 7) % 7;
+                        NSInteger lastIndex = (numberOfDaysInMonth + numberOfPlaceholdersForPrev )% 7;
+                        lastIndex;
+                    });
+                    width *= column / 7.0;
+                }
+                width;
+            });
+            
+            
+            
             CGFloat height = FSCalendarStandardSeparatorThickness;
             attributes.frame = CGRectMake(x, y, width, height);
             attributes.zIndex = NSIntegerMax;

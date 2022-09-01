@@ -1,5 +1,5 @@
 //
-//  FSCalendarConstants.h
+//  FSCalendarConstane.h
 //  FSCalendar
 //
 //  Created by dingwenchao on 8/28/15.
@@ -29,7 +29,6 @@ CG_EXTERN CGFloat const FSCalendarStandardHeaderTextSize;
 CG_EXTERN CGFloat const FSCalendarMaximumEventDotDiameter;
 
 UIKIT_EXTERN NSInteger const FSCalendarDefaultHourComponent;
-UIKIT_EXTERN NSInteger const FSCalendarMaximumNumberOfEvents;
 
 UIKIT_EXTERN NSString * const FSCalendarDefaultCellReuseIdentifier;
 UIKIT_EXTERN NSString * const FSCalendarBlankCellReuseIdentifier;
@@ -49,8 +48,8 @@ CG_EXTERN CGSize const CGSizeAutomatic;
 #define FSCalendarStandardTitleTextColor   FSColorRGBA(14,69,221 ,1.0)
 #define FSCalendarStandardEventDotColor    FSColorRGBA(31,119,219,0.75)
 
-#define FSCalendarStandardLineColor        [[UIColor lightGrayColor] colorWithAlphaComponent:0.30]
-#define FSCalendarStandardSeparatorColor   [[UIColor lightGrayColor] colorWithAlphaComponent:0.60]
+#define FSCalendarStandardLineColor        FSColorRGBA(132,140,196,0.1)
+#define FSCalendarStandardSeparatorColor   FSColorRGBA(231,232,240,1.0)
 
 #define FSColorRGBA(r,g,b,a) [UIColor colorWithRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:a]
 #define FSCalendarInAppExtension [[[NSBundle mainBundle] bundlePath] hasSuffix:@".appex"]

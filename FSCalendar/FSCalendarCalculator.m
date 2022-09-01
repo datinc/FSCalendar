@@ -221,7 +221,7 @@
     if (self.calendar.placeholderType == FSCalendarPlaceholderTypeFillSixRows) return 6;
     
     NSNumber *rowCount = self.rowCounts[month];
-    if (rowCount == nil) {
+    if (!rowCount) { // TODO: Converting a pointer value of type 'NSNumber *' to a primitive boolean value; instead, either compare the pointer to nil or call -boolValue
         NSDate *firstDayOfMonth = [self.gregorian fs_firstDayOfMonth:month];
         NSInteger weekdayOfFirstDay = [self.gregorian component:NSCalendarUnitWeekday fromDate:firstDayOfMonth];
         NSInteger numberOfDaysInMonth = [self.gregorian fs_numberOfDaysInMonth:month];
@@ -283,7 +283,7 @@
     [self.rowCounts removeAllObjects];
 }
 
-#pragma mark - Private functions
+#pragma mark - Private functinos
 
 - (void)didReceiveNotifications:(NSNotification *)notification
 {
